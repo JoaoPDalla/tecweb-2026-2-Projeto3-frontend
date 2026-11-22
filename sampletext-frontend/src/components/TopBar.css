@@ -1,0 +1,61 @@
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  height: 64px;
+  padding: 0 24px;
+  background: var(--cor-barra);
+  color: #ffffff;
+}
+
+.topbar__esquerda {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.topbar__menu {
+  display: grid;
+  place-content: center;
+  width: 52px;
+  height: 40px;
+  border: 0;
+  border-radius: 6px;
+  background: var(--cor-painel);
+  cursor: pointer;
+}
+
+.topbar__marca,
+.topbar__saudacao {
+  margin: 0;
+  font-family: var(--fonte-titulo);
+  font-size: 32px;
+  line-height: 1;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.topbar__saudacao {
+  min-width: 0;
+  max-width: 40vw;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 600px) {
+  .topbar {
+    padding: 0 12px;
+  }
+
+  .topbar__esquerda {
+    gap: 10px;
+    flex-shrink: 0;
+  }
+
+  .topbar__marca,
+  .topbar__saudacao {
+    font-size: 22px;
+  }
+}
