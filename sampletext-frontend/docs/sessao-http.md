@@ -27,8 +27,11 @@ e validado pelo backend existente; a proteção de rotas não substitui essa val
 
 `request(caminho, opcoes)` mantém compatibilidade com os serviços existentes.
 As opções são `method`, `corpo`, `signal`, `timeout`, `autenticar` e `token`.
-O timeout padrão é 120 segundos, cobrindo as duas chamadas de IA de até 45 segundos
-do backend. O token é incluído por padrão; o login usa `autenticar: false`.
+O timeout padrão é 120 segundos. Os pedidos de geração e validação de tema do
+fluxo de estudo usam 300 segundos (5 minutos), cobrindo duas chamadas de IA de até
+120 segundos cada no backend, com uma margem de 60 segundos para transporte e
+processamento. Login e operações de livros/conteúdos conservam o timeout padrão.
+O token é incluído por padrão; o login usa `autenticar: false`.
 
 `ApiError` fornece `message`, `status`, `code` e `errors`. Erros de campo aninhados
 e erros `{code, detail}` do backend são interpretados. HTML de erro não é exibido
