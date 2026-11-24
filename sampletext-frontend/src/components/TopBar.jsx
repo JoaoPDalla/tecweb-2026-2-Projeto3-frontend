@@ -11,7 +11,7 @@ export default function TopBar({ menuAberto = false, menuId, onMenuClick }) {
   const pedido = useRequest()
   const nome = sessao?.usuario?.nome ?? lerSessao()?.nome
   const temRouter = useInRouterContext()
-  const marca = 'SampleText'
+  const marca = 'Fichário'
 
   return (
     <header className="topbar">

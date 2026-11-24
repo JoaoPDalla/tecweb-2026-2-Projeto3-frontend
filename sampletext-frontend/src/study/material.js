@@ -14,7 +14,7 @@ const invalido = () => new ApiError('O servidor retornou um material incompleto 
 // Verifica o contrato de transporte antes de iniciar uma tentativa da #14.
 export function validarMaterial(dados, temaSolicitado, { salvo = false } = {}) {
   if (!dados || !texto(dados.tema) || !texto(dados.resumo) || (!salvo && chaveTema(dados.tema) !== chaveTema(temaSolicitado))
-    || !Array.isArray(dados.perguntas) || (!salvo && dados.perguntas.length !== 10)) throw invalido()
+    || !Array.isArray(dados.perguntas) || (!salvo && (dados.perguntas.length < 5 || dados.perguntas.length > 10))) throw invalido()
   const ids = new Set()
   const enunciados = new Set()
   const perguntas = dados.perguntas.map((pergunta) => {
