@@ -32,13 +32,16 @@ continua disponível apenas para os testes do controlador.
 - `quiz/QuizSession.jsx` e `QuizPages.jsx`: entregam as perguntas reais ao reducer
   da #14 e os dados de apresentação às telas. Markdown/LaTeX são renderizados
   pelo componente Markdown já existente, por um callback de apresentação.
+- `quiz/persistentQuiz.js`: confirma as respostas no servidor antes de chamar o
+  reducer; mantém uma chave por pergunta e tentativa para permitir reenvios seguros.
+- `services/respostas.js`: envia a alternativa e confere a confirmação recebida.
 
 `quiz/quiz.js`, as regras de pontuação e os componentes de resolução/resultado
 não foram reescritos. As mudanças na busca se limitam à importação do serviço real.
-Os serviços de CRUD (`conteudos.js`, `livros.js`), telas de livro, menu e modais
-da entrega dos outros integrantes permanecem preservados.
+O serviço de conteúdos recebeu apenas o campo opcional `perguntas` no salvamento.
+As telas de livro, o menu, os modais e as demais operações de CRUD foram preservados.
 
-## Conteúdos salvos e limites do backend
+## Conteúdos salvos e histórico
 
 `/resumo?conteudo=<id>` continua reabrindo o resumo pelo serviço existente, sem
 gerar ou substituir seu texto. Se houver perguntas vinculadas, o quiz usa a lista
@@ -46,20 +49,35 @@ retornada pelo backend, com sua quantidade real (o contrato de nova geração ex
 dez). O título do conteúdo pode ter sido renomeado sem modificar o tema das
 perguntas; essa organização do conteúdo salvo é respeitada.
 
-Atualmente, a geração retorna perguntas com IDs locais como `pergunta-1`, e o
-salvamento de Conteúdo aceita livro, tema e resumo, sem persistir essas perguntas.
-O frontend não inventa IDs de banco nem envia esses identificadores ao endpoint
-de respostas. A correção e a nota continuam no controlador local da #14; o
-registro de respostas no histórico é uma integração separada dessa leitura.
+A geração retorna IDs reais de perguntas já gravadas no backend, permitindo
+registrar respostas mesmo sem salvar o resumo. Ao salvar, o frontend envia
+`{livro, tema, resumo, perguntas}`; o backend grava o conteúdo e cópias das dez
+perguntas na mesma transação. Ao entrar no quiz depois do salvamento, a URL passa
+a usar `conteudo=<id>` e carrega os IDs dessas cópias. Isso permite consultar as
+respostas pelo filtro de conteúdo do histórico.
+
+Cada confirmação envia `POST /api/perguntas/<id>/responder/` com
+`{alternativa, chave_envio}`. A chave é um UUID por pergunta e tentativa. Só depois
+da confirmação válida o reducer recebe a resposta e avança ou abre a resolução.
+Falhas mantêm a seleção e permitem repetir com a mesma chave: uma confirmação
+perdida não gera dois registros. Mudar a alternativa após um envio já registrado
+recebe 409 e oferece reiniciar o quiz. Refazer cria novas chaves, sem apagar o
+histórico anterior. A nota continua no reducer puro, conferida contra o gabarito
+e o resultado calculado pelo servidor.
+
+IDs locais de versões antigas são recusados antes do envio, com orientação para
+atualizar o backend e reabrir o material. Respostas feitas antes de salvar o resumo
+continuam no histórico geral, vinculadas às perguntas da geração; salvar depois
+não reescreve registros anteriores para associá-los às cópias do conteúdo.
 
 Para um resumo salvo sem perguntas, a interface informa a ausência e oferece
 **Gerar novo material**. Essa ação abre uma nova geração sobre o tema, com resumo
 e questões consistentes entre si, preservando o resumo salvo. Não mostra o quiz
 de exemplo nem um resultado artificial de zero questões.
 
-O salvamento conserva o modal existente e o livro escolhido. Uma resposta de
-salvamento com `perguntas: []` não apaga as questões da tentativa atual. Ao voltar
-do quiz, o estado de salvo também é conservado enquanto o material estiver aberto.
+O salvamento conserva o modal existente e o livro escolhido. Conteúdos antigos
+sem perguntas não recebem questões artificiais. Clientes antigos ainda podem
+salvar somente o resumo, sem enviar `perguntas`.
 
 ## Erros e navegação
 
@@ -75,7 +93,8 @@ tratado pela sessão da #6 e leva ao login.
 
 Recarregar a página ou sair do fluxo descarta a tentativa em memória. Se a URL
 identificar o tema ou conteúdo, o material é consultado novamente e o quiz começa
-uma nova tentativa. Abrir uma URL de quiz sem origem pede a escolha de um tema,
+uma nova tentativa; as respostas já confirmadas continuam no histórico do backend.
+Abrir uma URL de quiz sem origem pede a escolha de um tema,
 sem assumir Regra da cadeia. O cancelamento interrompe a espera no cliente; não
 garante interromper uma geração que o servidor já tenha iniciado.
 
@@ -84,7 +103,9 @@ garante interromper uma geração que o servidor já tenha iniciado.
 Configure `VITE_API_URL` e use `VITE_USAR_MOCK=false` para ligar também o CRUD de
 livros/conteúdos à API real. A chave da IA é configurada somente no backend.
 O modo mock de CRUD dos outros serviços continua disponível para desenvolvimento;
-ele não altera o serviço de geração usado nesta integração.
+ele não altera os serviços de geração e respostas, que usam a API real. Para
+associar o histórico ao conteúdo salvo no banco, use o CRUD real e aplique a
+migração `0005_persistencia_quiz` do backend antes de iniciar este frontend.
 
 ```text
 npm test
@@ -97,3 +118,8 @@ material, o fluxo foi conferido no navegador com Django real e banco temporário
 simulando somente o provedor de IA: login, busca, geração, dez perguntas, resolução,
 resultado, reinício, retorno ao resumo, falha/recuperação, tema inválido, modal de
 salvamento, navegação ao livro e reabertura por ID. Nenhum crédito de IA foi consumido.
+
+A persistência também foi conferida com uma falha simulada depois de gravar a
+primeira resposta: o reenvio confirmou o mesmo registro. O quiz terminou com 9/10,
+uma nova tentativa gravou outra resposta e a API devolveu onze registros, sem
+duplicação do reenvio. O resumo reaberto conservou suas dez perguntas.

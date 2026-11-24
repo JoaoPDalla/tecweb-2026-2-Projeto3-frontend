@@ -9,6 +9,11 @@ entrega de livros/conteúdos foram preservados. Configure `VITE_API_URL` e
 `VITE_USAR_MOCK=false` para usar também o CRUD real. Consulte os contratos e
 limites em [integração de estudo](docs/integracao-estudo.md).
 
+Salvar agora inclui as dez perguntas do material. O quiz registra cada escolha
+no histórico da API antes de avançar e permite reenviar sem duplicar registros.
+Atualize também o backend e execute `python manage.py migrate` para aplicar a
+migração `0005_persistencia_quiz`.
+
 ## Sessão e HTTP — #6 e #12
 
 As rotas de estudo agora validam a sessão com o backend. O contexto compartilha
@@ -64,8 +69,9 @@ a última pergunta: a resolução aparece antes do resultado. O percentual final
 Refazer limpa respostas e pontuação e retorna à primeira pergunta.
 
 `/resultado` recebe apenas a nota já calculada; suas telas não foram alteradas.
-Voltar pelo histórico não soma pontos nem permite pular questões. A tentativa
-não é persistida: recarregar a página ou sair do fluxo inicia uma nova sessão.
+Voltar pela navegação do navegador não soma pontos nem permite pular questões.
+O progresso da tentativa fica em memória: recarregar a página ou sair do fluxo
+inicia uma nova sessão, preservando as respostas já confirmadas no histórico da API.
 
 A correção e a pontuação permanecem isoladas em `src/quiz/quiz.js`; esse módulo
 não importa React, navegação ou serviços HTTP.

@@ -14,7 +14,7 @@ import './QuizPages.css'
 export function QuizQuestionPage() {
   const { href } = useStudy()
   const rotaPergunta = href('/pergunta')
-  const { state, dispatch } = useQuizSession()
+  const { state, dispatch, submitAnswer, error } = useQuizSession()
   const location = useLocation()
   const navigate = useNavigate()
   const mainRef = useRef(null)
@@ -50,8 +50,10 @@ export function QuizQuestionPage() {
           renderText={(texto) => <Markdown inline>{texto}</Markdown>}
           number={state.position + 1}
           total={state.questions.length}
-          onSubmitAnswer={({ questionId, answerId }) => dispatch({ type: 'answer', questionId, answerId })}
+          onSubmitAnswer={submitAnswer}
+          errorMessage={error?.message}
         />
+        {error?.code === 'envio_ja_registrado' && <button type="button" className="botao botao--escuro" onClick={() => dispatch({ type: 'restart' })}>Reiniciar quiz</button>}
       </main>
     </Layout>
   )
