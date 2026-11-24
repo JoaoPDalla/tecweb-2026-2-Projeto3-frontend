@@ -24,9 +24,10 @@ export function abrirConteudo(id, opcoes = {}) {
 }
 
 // Salva o resumo em um livro do usuário. A API exige o `livro`.
-export function salvarConteudo({ livro, tema, resumo }, opcoes = {}) {
-  if (usarMock()) return loja.salvarConteudo({ livro, tema, resumo })
-  return request('/conteudos/', { ...opcoes, method: 'POST', corpo: { livro: Number(livro), tema, resumo } })
+export function salvarConteudo({ livro, tema, resumo, perguntas }, opcoes = {}) {
+  const dados = { livro: Number(livro), tema, resumo, ...(perguntas === undefined ? {} : { perguntas }) }
+  if (usarMock()) return loja.salvarConteudo(dados)
+  return request('/conteudos/', { ...opcoes, method: 'POST', corpo: dados })
 }
 
 // Troca o tema (o título) de um conteúdo salvo.

@@ -32,7 +32,9 @@ function StudySession() {
   useEffect(() => { if (tema || conteudoId !== null) store.load(tema, { livro, conteudoId }) }, [store, tema, livro, conteudoId])
 
   const href = (caminho) => {
-    const query = new URLSearchParams(conteudoId !== null ? { conteudo: conteudoId } : { tema: estado.temaSolicitado })
+    const salvo = Object.values(estado.salvos).at(-1)
+    const origem = conteudoId ?? salvo?.id
+    const query = new URLSearchParams(origem != null ? { conteudo: origem } : { tema: estado.temaSolicitado })
     if (estado.livro) query.set('livro', estado.livro)
     return `${caminho}?${query}`
   }

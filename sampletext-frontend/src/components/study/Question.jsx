@@ -7,7 +7,7 @@ export default function Question(props) {
   return <QuestionForm key={props.question.id} {...props} />
 }
 
-function QuestionForm({ question, number, total, selectedAnswerId, onAnswer, onSubmitAnswer, disabled = false, renderText = (texto) => texto }) {
+function QuestionForm({ question, number, total, selectedAnswerId, onAnswer, onSubmitAnswer, disabled = false, renderText = (texto) => texto, errorMessage }) {
   const inputId = useId()
   const [localAnswerId, setLocalAnswerId] = useState(null)
   const [status, setStatus] = useState('idle')
@@ -81,7 +81,7 @@ function QuestionForm({ question, number, total, selectedAnswerId, onAnswer, onS
         </div>
         {status === 'error' && (
           <p className="question-error" role="alert">
-            Não foi possível enviar sua resposta. Tente novamente.
+            {errorMessage || 'Não foi possível enviar sua resposta. Tente novamente.'}
           </p>
         )}
       </form>

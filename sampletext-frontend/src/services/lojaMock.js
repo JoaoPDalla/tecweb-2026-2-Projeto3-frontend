@@ -107,21 +107,22 @@ export async function excluirLivro(id) {
 export async function abrirConteudo(id) {
   await esperar()
   const { livro, conteudo } = acharConteudo(id)
-  return { id: conteudo.id, livro: livro.id, tema: conteudo.tema, resumo: conteudo.resumo, criado_em: conteudo.criado_em, perguntas: [] }
+  return { id: conteudo.id, livro: livro.id, tema: conteudo.tema, resumo: conteudo.resumo, criado_em: conteudo.criado_em, perguntas: structuredClone(conteudo.perguntas ?? []) }
 }
 
-export async function salvarConteudo({ livro, tema, resumo }) {
+export async function salvarConteudo({ livro, tema, resumo, perguntas = [] }) {
   await esperar()
   const destino = acharLivro(livro)
   const dados = {
     id: loja().proximoConteudo++,
     tema: limparNome(tema, 255, 'O tema'),
     resumo: String(resumo ?? '').trim(),
+    perguntas: structuredClone(perguntas),
     criado_em: new Date().toISOString(),
   }
   if (!dados.resumo) throw new ApiError('O resumo não pode ficar em branco.', 400)
   destino.conteudos.push(dados)
-  return { id: dados.id, livro: destino.id, tema: dados.tema, resumo: dados.resumo, criado_em: dados.criado_em, perguntas: [] }
+  return { id: dados.id, livro: destino.id, tema: dados.tema, resumo: dados.resumo, criado_em: dados.criado_em, perguntas: structuredClone(dados.perguntas) }
 }
 
 export async function renomearConteudo(id, tema) {

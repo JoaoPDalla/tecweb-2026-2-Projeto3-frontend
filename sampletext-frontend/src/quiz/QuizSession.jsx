@@ -1,6 +1,6 @@
-import { useReducer } from 'react'
+import { useEffect, useState, useSyncExternalStore } from 'react'
 import { Outlet, useNavigate } from 'react-router-dom'
-import { createQuizState, quizReducer } from './quiz'
+import { createPersistentQuiz } from './persistentQuiz.js'
 import { QuizContext } from './QuizContext'
 import { useStudy } from '../study/useStudy'
 import StudyStatus from '../study/StudyStatus'
@@ -16,6 +16,9 @@ export function QuizSession() {
 }
 
 function QuizAttempt({ perguntas }) {
-  const [state, dispatch] = useReducer(quizReducer, perguntas, createQuizState)
-  return <QuizContext.Provider value={{ state, dispatch }}><Outlet /></QuizContext.Provider>
+  const [store] = useState(() => createPersistentQuiz(perguntas))
+  const { state, pending, error } = useSyncExternalStore(store.subscribe, store.getSnapshot, store.getSnapshot)
+  useEffect(() => store.connect(), [store])
+  return <QuizContext.Provider value={{ state, dispatch: store.dispatch, submitAnswer: store.submitAnswer,
+    pending, error }}><Outlet /></QuizContext.Provider>
 }

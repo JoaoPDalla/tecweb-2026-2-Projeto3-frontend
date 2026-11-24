@@ -15,7 +15,7 @@ export function useResumo() {
   const ativo = Boolean(livroSalvo)
   const statusSalvar = ativo ? 'salvo' : pedido.loading ? 'salvando' : pedido.error ? 'erro' : 'parado'
   function guardar(livroId, signal) {
-    return salvarConteudo({ livro: livroId, tema: conteudo.tema, resumo: conteudo.resumo }, { signal })
+    return salvarConteudo({ livro: livroId, tema: conteudo.tema, resumo: conteudo.resumo, perguntas: conteudo.perguntas }, { signal })
   }
   async function salvar() {
     if (trava.current || ativo) return
