@@ -37,6 +37,7 @@
 }
 
 .topbar__saudacao {
+  margin-left: auto;
   min-width: 0;
   max-width: 40vw;
   overflow: hidden;
@@ -73,3 +74,17 @@ a.topbar__marca {
 a.topbar__marca:hover {
   opacity: 0.85;
 }
+
+.topbar__sair {
+  flex-shrink: 0;
+  padding: 8px 12px;
+  border: 1px solid currentColor;
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.topbar__sair:disabled { opacity: 0.6; cursor: wait; }
+.topbar__sair:focus-visible { outline: 2px solid white; outline-offset: 3px; }

@@ -1,11 +1,15 @@
 import { Link, useInRouterContext } from 'react-router-dom'
 import { lerSessao } from '../services/auth'
+import { useAuth } from '../auth/useAuth'
+import { useRequest } from '../hooks/useRequest'
 import './TopBar.css'
 
 // Barra superior: botão do menu, nome do app (leva ao início) e saudação.
 // O Layout controla o menu: aqui só chegam o estado (`menuAberto`) e o clique.
 export default function TopBar({ menuAberto = false, menuId, onMenuClick }) {
-  const nome = lerSessao()?.nome
+  const sessao = useAuth(true)
+  const pedido = useRequest()
+  const nome = sessao?.usuario?.nome ?? lerSessao()?.nome
   const temRouter = useInRouterContext()
   const marca = 'SampleText'
 
@@ -36,6 +40,12 @@ export default function TopBar({ menuAberto = false, menuId, onMenuClick }) {
       <p className="topbar__saudacao" title={nome}>
         Olá{nome ? ` ${nome}` : ''}
       </p>
+      {sessao?.status === 'authenticated' && (
+        <button type="button" className="topbar__sair" disabled={pedido.loading} onClick={() => pedido.executar((signal) => sessao.sair(signal)).catch(() => {})}>
+          {pedido.loading ? 'Saindo…' : 'Sair'}
+        </button>
+      )}
+      {pedido.error && <p role="alert">{pedido.error.message}</p>}
     </header>
   )
 }
