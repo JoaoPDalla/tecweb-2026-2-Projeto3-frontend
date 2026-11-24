@@ -91,6 +91,10 @@ da API e permitem tentar novamente. Temas recusados ou amplos orientam a escolhe
 outro. Conteúdo inexistente apresenta erro de abertura. Um 401 continua sendo
 tratado pela sessão da #6 e leva ao login.
 
+Geração e validação de tema aguardam até 5 minutos no frontend. O backend permite
+até 120 segundos por chamada ao Gemini; a geração pode executar duas chamadas.
+O cancelamento ao sair da tela continua disponível durante essa espera.
+
 Recarregar a página ou sair do fluxo descarta a tentativa em memória. Se a URL
 identificar o tema ou conteúdo, o material é consultado novamente e o quiz começa
 uma nova tentativa; as respostas já confirmadas continuam no histórico do backend.
