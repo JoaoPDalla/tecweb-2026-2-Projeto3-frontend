@@ -1,0 +1,53 @@
+.inicio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: clamp(40px, 12vh, 120px) 24px 48px;
+  text-align: center;
+}
+
+.inicio__form {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 20px;
+  width: min(100%, 460px);
+}
+
+.inicio__campo {
+  width: 100%;
+  padding: 14px 16px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--cor-papel);
+  color: var(--cor-texto-papel);
+  font-size: 18px;
+}
+
+.inicio__campo::placeholder {
+  color: #6b6b6b;
+}
+
+.inicio__campo[readonly] {
+  opacity: 0.75;
+}
+
+/* O foco global usa box-shadow; aqui ele é somado à borda de erro para não sumir. */
+.inicio__campo[aria-invalid='true'] {
+  box-shadow: inset 0 0 0 2px var(--cor-erro);
+}
+
+.inicio__campo[aria-invalid='true']:focus-visible {
+  box-shadow: inset 0 0 0 2px var(--cor-erro), 0 0 0 5px #1b3a33;
+}
+
+.inicio__aviso {
+  margin: 0;
+  color: #1b3a33;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.inicio__aviso--erro {
+  color: #7a1212;
+}

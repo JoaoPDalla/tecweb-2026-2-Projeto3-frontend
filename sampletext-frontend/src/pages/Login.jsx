@@ -4,8 +4,8 @@ import { login } from '../services/api'
 import { salvarSessao } from '../services/auth'
 import './Login.css'
 
-// Para onde ir depois de entrar. Troque por '/inicio' quando a tela inicial existir.
-const DESTINO_APOS_LOGIN = '/resumo'
+// Para onde ir depois de entrar: a tela de busca.
+const DESTINO_APOS_LOGIN = '/inicio'
 
 export default function Login() {
   const navigate = useNavigate()

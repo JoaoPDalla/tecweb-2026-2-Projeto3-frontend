@@ -1,0 +1,63 @@
+.menu {
+  flex: 0 0 clamp(120px, 28vw, 240px);
+  padding: 16px 12px 24px;
+  background: var(--cor-barra);
+  color: var(--cor-texto-sobre-fundo);
+}
+
+.menu__titulo {
+  margin: 0 0 16px;
+  font-family: var(--fonte-titulo);
+  font-size: 24px;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.menu__lista {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.menu__livro {
+  display: block;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: var(--cor-painel);
+  color: #34423e;
+  font-family: var(--fonte-titulo);
+  font-size: 20px;
+  letter-spacing: 0.04em;
+  line-height: 1.2;
+  text-align: center;
+  text-decoration: none;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+
+.menu__livro:hover {
+  background: #d4e2e4;
+}
+
+.menu__livro--ativo,
+.menu__livro--ativo:hover {
+  background: var(--cor-selecionado);
+  color: #0f3a45;
+}
+
+.menu__aviso {
+  margin: 0 0 12px;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.botao.menu__tentar {
+  width: 100%;
+  font-size: 18px;
+  padding: 8px 10px;
+}

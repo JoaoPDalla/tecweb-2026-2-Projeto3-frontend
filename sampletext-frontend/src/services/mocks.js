@@ -72,3 +72,25 @@ export const resolucaoMock = {
       'Pela regra da cadeia, derive a potência (função de fora) e multiplique pela derivada de $5x^2 + 3x^3$, que é $10x + 9x^2$.',
   },
 }
+
+// Livros de exemplo (menu lateral e tela do livro). Cada tópico vira um chip.
+export const livrosMock = [
+  {
+    id: 1,
+    nome: 'Cálculo I',
+    topicos: [
+      { id: 1, tema: 'Integral definida' },
+      { id: 2, tema: 'Limite' },
+      { id: 3, tema: 'Derivadas' },
+    ],
+  },
+  {
+    id: 2,
+    nome: 'Química',
+    topicos: [
+      { id: 4, tema: 'Ligações químicas' },
+      { id: 5, tema: 'Estequiometria' },
+    ],
+  },
+  { id: 3, nome: 'História', topicos: [] },
+]

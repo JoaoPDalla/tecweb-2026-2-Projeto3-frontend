@@ -1,5 +1,23 @@
 # React + Vite
 
+## Busca, menu lateral e tela do livro (#3, #7 e #13)
+
+- `/inicio` (`pages/Inicio.jsx`): tela "O que vamos estudar hoje?". Valida o tema e, se servir, abre `/resumo?tema=...`. O login agora leva para ela. Estados: carregando ("Verificando o tema…"), tema amplo ("Cálculo I é um tema muito amplo, destrinche", com o campo limpo), matéria inválida (mantém o texto para corrigir), campo vazio e erro de conexão (com "Tentar de novo").
+- `/livro/:id` (`pages/Livro.jsx`): tópicos do livro como chips (cada um abre o resumo do tema) e botão "Novo conteúdo", que volta à busca. Livro sem tópicos, livro inexistente (404) e erro de rede têm mensagem própria.
+- `components/Sidebar.jsx`: menu "Meus livros", com o livro aberto destacado. O `Layout` controla se ele está aberto, pelo botão da barra ou pela tecla Esc, e lembra o estado ao trocar de tela (`sessionStorage`).
+- `components/TopBar.jsx` (#3): o botão de menu agora funciona e informa `aria-expanded`; a marca "SampleText" leva a `/inicio`.
+- `services/livros.js`: `listarLivros`, `buscarLivro` e `validarTema`. Com `VITE_USAR_MOCK` ligado (padrão) usam `livrosMock` e `services/temas.js`. As rotas reais estão marcadas com `TODO` (#9 do backend e validação do tema):
+  `GET /livros/`, `GET /livros/:id/` e `POST /conteudos/validar-tema/` (resposta `{ status: 'ok' | 'amplo' | 'invalido', tema? }`).
+
+No modo mock, testar na busca: `Cálculo I` ou `Química` (tema amplo), `qwrtp` (inválido) e `Regra da cadeia` (válido).
+
+Testar as regras de classificação do tema sem navegador:
+
+```sh
+node --test src/services/temas.test.js
+```
+
+
 ## Quiz com dados de exemplo — #14
 
 A #14 fica em `src/quiz/`, separada das telas #5, #10 e #18:
