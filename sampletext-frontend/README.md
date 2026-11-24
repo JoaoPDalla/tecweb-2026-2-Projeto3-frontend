@@ -1,5 +1,38 @@
 # React + Vite
 
+## Quiz com dados de exemplo — #14
+
+A #14 fica em `src/quiz/`, separada das telas #5, #10 e #18:
+
+- `quiz.js`: reducer puro, correção, pontuação, avanço, resolução e reinício.
+- `exampleQuestions.js`: três questões de Regra da cadeia com alternativas e explicações fixas. Não chama IA ou API.
+- `QuizSession.jsx`: mantém a tentativa em memória entre as rotas do quiz.
+- `QuizPages.jsx`: conecta os contratos das telas às ações do controlador e reutiliza a página `Resolucao` existente, sem editar seu código.
+
+Executar `npm run dev` e abrir `/pergunta`, ou usar o botão Perguntas do resumo
+existente. O quiz sempre usa os três exemplos de Regra da cadeia, independentemente
+do conteúdo solicitado no resumo. A integração com dados reais permanece na #16.
+
+Uma confirmação correta vale um ponto e avança. Uma incorreta abre a resolução
+e só avança quando o estudante clica em Próxima pergunta. Isso também vale para
+a última pergunta: a resolução aparece antes do resultado. O percentual final
+é a proporção de acertos arredondada ao inteiro mais próximo, com pesos iguais.
+Refazer limpa respostas e pontuação e retorna à primeira pergunta.
+
+`/resultado` recebe apenas a nota já calculada; suas telas não foram alteradas.
+Voltar pelo histórico não soma pontos nem permite pular questões. A tentativa
+não é persistida: recarregar a página ou sair do fluxo inicia uma nova sessão.
+
+As únicas alterações no fluxo compartilhado são os registros de rotas em
+`App.jsx`. Login, resumo, resolução, barra, estilos globais e serviços existentes
+permanecem inalterados.
+
+Testar as regras sem navegador ou dependências adicionais:
+
+```sh
+node --test src/quiz/quiz.test.js
+```
+
 ## Telas de estudo — Ma7zz (#5, #10 e #18)
 
 Esta entrega adiciona componentes isolados em `src/components/study/`:
@@ -81,10 +114,9 @@ consumidor; a tela não limpa sessão, inicia perguntas nem decide rotas.
 
 ### Limite com a #14
 
-O controlador externo deverá fornecer perguntas, receber respostas, corrigir,
-calcular a nota, controlar a sequência, abrir a resolução e fornecer o resultado
-final. Nenhuma dessas regras foi implementada nesta entrega. A conexão ao fluxo
-real e à API continua para as respectivas tarefas de integração.
+As telas de `components/study/` recebem perguntas e callbacks e não corrigem,
+calculam notas ou escolhem a sequência. Essas regras ficam no controlador
+`src/quiz/` da #14, documentado acima. A conexão à API e à IA continua na #16.
 
 ## Informações do template
 

@@ -1,0 +1,3 @@
+.quiz-session-page { max-width: 1440px; margin: 0 auto; }
+.quiz-session-page:focus { outline: none; box-shadow: none; }
+.quiz-session-note { margin: 20px 24px 0; font-size: 1rem; color: #34423e; }
