@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import Layout from '../components/Layout'
-import { validarTema } from '../services/livros'
+import { validarTema } from '../services/geracao'
 import './Inicio.css'
 
 const TITULO_PADRAO = 'O que vamos estudar hoje?'

@@ -1,5 +1,14 @@
 # React + Vite
 
+## Integração do resumo e quiz — #16
+
+O fluxo de estudo usa a API para validar o tema e carregar um resumo com dez
+perguntas. Resumo, resolução e resultado compartilham o mesmo material; erros
+não são substituídos por exemplos. A reabertura por ID e o modal de salvar da
+entrega de livros/conteúdos foram preservados. Configure `VITE_API_URL` e
+`VITE_USAR_MOCK=false` para usar também o CRUD real. Consulte os contratos e
+limites em [integração de estudo](docs/integracao-estudo.md).
+
 ## Sessão e HTTP — #6 e #12
 
 As rotas de estudo agora validam a sessão com o backend. O contexto compartilha
@@ -35,18 +44,18 @@ node --test src/services/temas.test.js
 ```
 
 
-## Quiz com dados de exemplo — #14
+## Controlador do quiz — #14
 
 A #14 fica em `src/quiz/`, separada das telas #5, #10 e #18:
 
 - `quiz.js`: reducer puro, correção, pontuação, avanço, resolução e reinício.
-- `exampleQuestions.js`: três questões de Regra da cadeia com alternativas e explicações fixas. Não chama IA ou API.
+- `exampleQuestions.js`: três questões fixas usadas somente nos testes do controlador.
 - `QuizSession.jsx`: mantém a tentativa em memória entre as rotas do quiz.
 - `QuizPages.jsx`: conecta os contratos das telas às ações do controlador e reutiliza a página `Resolucao` existente, sem editar seu código.
 
-Executar `npm run dev` e abrir `/pergunta`, ou usar o botão Perguntas do resumo
-existente. O quiz sempre usa os três exemplos de Regra da cadeia, independentemente
-do conteúdo solicitado no resumo. A integração com dados reais permanece na #16.
+Executar `npm run dev`, entrar e escolher um tema na busca. O botão Perguntas do
+resumo abre o quiz com os dados carregados pela #16. As URLs do quiz preservam
+o tema ou o ID do conteúdo salvo para identificar a origem do material.
 
 Uma confirmação correta vale um ponto e avança. Uma incorreta abre a resolução
 e só avança quando o estudante clica em Próxima pergunta. Isso também vale para
@@ -58,9 +67,8 @@ Refazer limpa respostas e pontuação e retorna à primeira pergunta.
 Voltar pelo histórico não soma pontos nem permite pular questões. A tentativa
 não é persistida: recarregar a página ou sair do fluxo inicia uma nova sessão.
 
-As únicas alterações no fluxo compartilhado são os registros de rotas em
-`App.jsx`. Login, resumo, resolução, barra, estilos globais e serviços existentes
-permanecem inalterados.
+A correção e a pontuação permanecem isoladas em `src/quiz/quiz.js`; esse módulo
+não importa React, navegação ou serviços HTTP.
 
 Testar as regras sem navegador ou dependências adicionais:
 

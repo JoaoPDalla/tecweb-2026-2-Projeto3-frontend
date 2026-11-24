@@ -7,7 +7,7 @@ export default function Question(props) {
   return <QuestionForm key={props.question.id} {...props} />
 }
 
-function QuestionForm({ question, number, total, selectedAnswerId, onAnswer, onSubmitAnswer, disabled = false }) {
+function QuestionForm({ question, number, total, selectedAnswerId, onAnswer, onSubmitAnswer, disabled = false, renderText = (texto) => texto }) {
   const inputId = useId()
   const [localAnswerId, setLocalAnswerId] = useState(null)
   const [status, setStatus] = useState('idle')
@@ -41,7 +41,7 @@ function QuestionForm({ question, number, total, selectedAnswerId, onAnswer, onS
   return (
     <section className="study-screen exercise-layout question-layout" aria-label="Pergunta">
       <QuestionProgress number={number} total={total} topic={question.topic} />
-      <h1 className="question-prompt" id={`${inputId}-prompt`}>{question.prompt}</h1>
+      <h1 className="question-prompt" id={`${inputId}-prompt`}>{renderText(question.prompt)}</h1>
       <form onSubmit={submitAnswer} aria-labelledby={`${inputId}-prompt`} aria-busy={status === 'submitting'}>
         <fieldset className="answer-grid" disabled={locked} aria-describedby={`${inputId}-hint`}>
           <legend className="study-sr-only">Alternativas de resposta</legend>
@@ -56,7 +56,7 @@ function QuestionForm({ question, number, total, selectedAnswerId, onAnswer, onS
                 aria-label={`Alternativa ${String.fromCharCode(65 + index)}: ${answer.text}`}
                 onChange={() => selectAnswer(answer.id)}
               />
-              <span>{answer.text}</span>
+              <span>{renderText(answer.text)}</span>
             </label>
           ))}
         </fieldset>

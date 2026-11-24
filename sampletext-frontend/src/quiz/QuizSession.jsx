@@ -1,17 +1,21 @@
-import { createContext, useContext, useReducer } from 'react'
-import { Outlet } from 'react-router-dom'
+import { useReducer } from 'react'
+import { Outlet, useNavigate } from 'react-router-dom'
 import { createQuizState, quizReducer } from './quiz'
-import { exampleQuestions } from './exampleQuestions'
-
-const QuizContext = createContext(null)
+import { QuizContext } from './QuizContext'
+import { useStudy } from '../study/useStudy'
+import StudyStatus from '../study/StudyStatus'
+import { ApiError } from '../services/api.js'
 
 export function QuizSession() {
-  const [state, dispatch] = useReducer(quizReducer, exampleQuestions, createQuizState)
-  return <QuizContext.Provider value={{ state, dispatch }}><Outlet /></QuizContext.Provider>
+  const { conteudo, materialId, novoMaterialHref } = useStudy()
+  const navigate = useNavigate()
+  if (!conteudo.perguntas.length) return <StudyStatus
+    erro={new ApiError('Este resumo ainda não tem perguntas vinculadas. Você pode gerar um novo material para praticar.', 422, 'perguntas_indisponiveis')}
+    onChangeTheme={() => navigate('/inicio')} onGenerate={() => navigate(novoMaterialHref)} />
+  return <QuizAttempt key={materialId} perguntas={conteudo.perguntas} />
 }
 
-export function useQuizSession() {
-  const session = useContext(QuizContext)
-  if (!session) throw new Error('Esta tela precisa estar dentro de QuizSession.')
-  return session
+function QuizAttempt({ perguntas }) {
+  const [state, dispatch] = useReducer(quizReducer, perguntas, createQuizState)
+  return <QuizContext.Provider value={{ state, dispatch }}><Outlet /></QuizContext.Provider>
 }
