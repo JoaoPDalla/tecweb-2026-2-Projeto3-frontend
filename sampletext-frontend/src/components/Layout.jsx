@@ -41,6 +41,8 @@ export default function Layout({ children }) {
     if (!menuVisivel) return undefined
     function aoTeclar(evento) {
       if (evento.key !== 'Escape') return
+      // Com uma janela de diálogo aberta, o Esc é dela: o menu fica como está.
+      if (document.querySelector('dialog[open]')) return
       setAberto(false)
       guardarMenuAberto(false)
       document.getElementById('botao-menu')?.focus()

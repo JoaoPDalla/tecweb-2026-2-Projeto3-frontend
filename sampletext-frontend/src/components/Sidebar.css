@@ -61,3 +61,18 @@
   font-size: 18px;
   padding: 8px 10px;
 }
+
+/* O botão aparece abaixo da lista, sem colar nos livros. */
+.botao.menu__novo {
+  width: 100%;
+  margin-top: 20px;
+  padding: 6px 10px;
+  border: 2px dashed var(--cor-painel);
+  background: transparent;
+  color: var(--cor-texto-sobre-fundo);
+  font-size: 20px;
+}
+
+.botao.menu__novo:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.14);
+}

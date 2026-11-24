@@ -73,12 +73,12 @@ export const resolucaoMock = {
   },
 }
 
-// Livros de exemplo (menu lateral e tela do livro). Cada tópico vira um chip.
+// Livros de exemplo (menu lateral e tela do livro). Cada conteúdo salvo vira um chip (o backend chama essa lista de `conteudos`).
 export const livrosMock = [
   {
     id: 1,
     nome: 'Cálculo I',
-    topicos: [
+    conteudos: [
       { id: 1, tema: 'Integral definida' },
       { id: 2, tema: 'Limite' },
       { id: 3, tema: 'Derivadas' },
@@ -87,10 +87,10 @@ export const livrosMock = [
   {
     id: 2,
     nome: 'Química',
-    topicos: [
+    conteudos: [
       { id: 4, tema: 'Ligações químicas' },
       { id: 5, tema: 'Estequiometria' },
     ],
   },
-  { id: 3, nome: 'História', topicos: [] },
+  { id: 3, nome: 'História', conteudos: [] },
 ]

@@ -1,26 +1,41 @@
-import { request } from './api'
-import { resumoMock } from './mocks'
+import { request } from './api.js'
+import * as loja from './lojaMock.js'
+import { usarMock } from './modo.js'
+import { resumoMock } from './mocks.js'
 
-const USAR_MOCK = import.meta.env.VITE_USAR_MOCK !== 'false'
-const esperar = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+// Resumos. Com VITE_USAR_MOCK ligado (padrão) usa exemplos em memória;
+// com `false` chama a API real.
 
-// Gera (ou reabre) o resumo de um tema.
-// Formato esperado: { id, tema, resumo }, com `resumo` em Markdown + LaTeX.
-// TODO: quando o endpoint de gerar conteúdo (issue #12) existir, confirme a rota e o formato aqui.
-export async function gerarConteudo(tema) {
-  if (USAR_MOCK) {
-    await esperar(400)
+// Gera o resumo de um tema (a IA do backend, com cache): { tema, resumo, perguntas }.
+// Não salva nada: para guardar em um livro, use salvarConteudo.
+export async function gerarConteudo(tema, opcoes = {}) {
+  if (usarMock()) {
+    await loja.esperar(400)
     return { ...resumoMock, tema }
   }
-  return request('/conteudos/gerar/', { method: 'POST', corpo: { tema } })
+  return request('/conteudos/gerar/', { ...opcoes, method: 'POST', corpo: { tema } })
 }
 
-// Salva o conteúdo em um livro.
-// TODO: ligar ao endpoint de Conteúdo (issue #9) e, depois, à escolha do livro.
-export async function salvarConteudo(conteudo) {
-  if (USAR_MOCK) {
-    await esperar(300)
-    return conteudo
-  }
-  return request('/conteudos/', { method: 'POST', corpo: { tema: conteudo.tema, resumo: conteudo.resumo } })
+// Reabre um conteúdo já salvo, sem gerar de novo:
+// { id, livro, tema, resumo, criado_em, perguntas }. Erro 404 se não existir.
+export function abrirConteudo(id, opcoes = {}) {
+  if (usarMock()) return loja.abrirConteudo(id)
+  return request(`/conteudos/${encodeURIComponent(id)}/`, opcoes)
+}
+
+// Salva o resumo em um livro do usuário. A API exige o `livro`.
+export function salvarConteudo({ livro, tema, resumo }, opcoes = {}) {
+  if (usarMock()) return loja.salvarConteudo({ livro, tema, resumo })
+  return request('/conteudos/', { ...opcoes, method: 'POST', corpo: { livro: Number(livro), tema, resumo } })
+}
+
+// Troca o tema (o título) de um conteúdo salvo.
+export function renomearConteudo(id, tema, opcoes = {}) {
+  if (usarMock()) return loja.renomearConteudo(id, tema)
+  return request(`/conteudos/${encodeURIComponent(id)}/`, { ...opcoes, method: 'PATCH', corpo: { tema } })
+}
+
+export async function excluirConteudo(id, opcoes = {}) {
+  if (usarMock()) await loja.excluirConteudo(id)
+  else await request(`/conteudos/${encodeURIComponent(id)}/`, { ...opcoes, method: 'DELETE' })
 }

@@ -80,6 +80,15 @@ input {
   background: #3a655a;
 }
 
+.botao--perigo {
+  background: #a61e1e;
+  color: #ffffff;
+}
+
+.botao--perigo:hover:not(:disabled) {
+  background: #8c1818;
+}
+
 /* Etiquetas ovais (Você errou / Errada / Certa) */
 .selo {
   display: inline-flex;

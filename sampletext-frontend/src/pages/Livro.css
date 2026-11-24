@@ -44,3 +44,56 @@
   width: min(100%, 340px);
   margin-top: auto;
 }
+
+.livro__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.livro__linha {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+/* Painel de gerenciamento do livro, no verde da barra. */
+.livro__painel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  max-width: 100%;
+  padding: 14px 20px;
+  border-radius: 12px;
+  background: var(--cor-barra);
+  color: var(--cor-texto-sobre-fundo);
+}
+
+.livro__nome {
+  margin: 0;
+  font-family: var(--fonte-titulo);
+  font-size: 26px;
+  letter-spacing: 0.04em;
+  line-height: 1.1;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+
+.botao.livro__mini {
+  padding: 3px 14px;
+  border-radius: 999px;
+  font-size: 17px;
+}
+
+.botao.livro__gerenciar {
+  padding: 6px 22px;
+  font-size: 18px;
+}
+
+.botao.livro__gerenciar[aria-pressed='true'] {
+  background: var(--cor-selecionado);
+  color: #0f3a45;
+}

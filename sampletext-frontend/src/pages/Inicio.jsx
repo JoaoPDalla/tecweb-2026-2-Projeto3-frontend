@@ -7,8 +7,11 @@ import './Inicio.css'
 const TITULO_PADRAO = 'O que vamos estudar hoje?'
 const PLACEHOLDER_PADRAO = 'Ex: Trigonometria'
 const PLACEHOLDER_AMPLO = 'Ex: Regra da Cadeia'
+const DICA_INVALIDO = 'Tente algo como Trigonometria ou Regra da Cadeia.'
+const DICA_AMPLO = 'Escolha um assunto mais específico dentro dele.'
 
-// Tela de busca: o usuário digita um tema e, se ele servir, vai para o resumo.
+// Tela de busca: valida o tema; se for amplo demais, pede um subtópico e valida de novo;
+// quando o tema serve, abre o resumo. O mesmo campo serve para as duas rodadas.
 // Estados: ocioso | vazio | carregando | amplo | invalido | erro
 export default function Inicio() {
   const navigate = useNavigate()
@@ -18,11 +21,12 @@ export default function Inicio() {
   const [tema, setTema] = useState('')
   const [estado, setEstado] = useState({ status: 'ocioso' })
   const pedidoAtual = useRef(0) // resultados de pedidos antigos são ignorados
+  const controlador = useRef(null) // cancela a validação em andamento ao sair da tela
 
-  // Se o usuário sair da tela no meio da validação, a resposta é descartada.
   useEffect(() => {
     return () => {
       pedidoAtual.current += 1
+      controlador.current?.abort()
     }
   }, [])
 
@@ -35,24 +39,23 @@ export default function Inicio() {
     }
 
     const pedido = ++pedidoAtual.current
+    controlador.current = new AbortController()
     setEstado({ status: 'carregando' })
     try {
-      const resposta = await validarTema(temaLimpo)
+      const resposta = await validarTema(temaLimpo, { signal: controlador.current.signal })
       if (pedido !== pedidoAtual.current) return
 
       if (resposta.status === 'ok') {
-        // TODO: o Resumo ainda não usa `livro`; quando salvar em um livro, é daqui que ele vem.
         const parametros = new URLSearchParams({ tema: temaLimpo })
-        if (livroId) parametros.set('livro', livroId)
+        if (livroId) parametros.set('livro', livroId) // o resumo salva direto neste livro
         navigate(`/resumo?${parametros}`)
         return
       }
 
-      const nome = resposta.tema ?? temaLimpo
-      if (resposta.status === 'amplo') setTema('') // campo limpo, pronto para o tema mais específico
-      setEstado({ status: resposta.status, tema: nome })
+      if (resposta.status === 'amplo') setTema('') // campo limpo, pronto para o subtópico
+      setEstado({ status: resposta.status, tema: resposta.tema ?? temaLimpo, motivo: resposta.motivo })
     } catch (e) {
-      if (pedido === pedidoAtual.current) setEstado({ status: 'erro', mensagem: e.message })
+      if (pedido === pedidoAtual.current && e?.name !== 'AbortError') setEstado({ status: 'erro', mensagem: e.message })
     }
   }
 
@@ -69,10 +72,12 @@ export default function Inicio() {
   if (amplo) titulo = `${estado.tema} é um tema muito amplo, destrinche`
   if (status === 'invalido') titulo = `“${estado.tema}” não parece uma matéria de estudo`
 
+  // O motivo vem da IA do backend; sem ele, usa uma dica fixa.
   let aviso = null
   if (carregando) aviso = { texto: 'Verificando o tema…', papel: 'status' }
   if (status === 'vazio') aviso = { texto: 'Digite um tema para começar.', papel: 'alert', erro: true }
-  if (status === 'invalido') aviso = { texto: 'Tente algo como Trigonometria ou Regra da Cadeia.', papel: 'status' }
+  if (amplo) aviso = { texto: estado.motivo || DICA_AMPLO, papel: 'status' }
+  if (status === 'invalido') aviso = { texto: estado.motivo || DICA_INVALIDO, papel: 'status' }
   if (status === 'erro') aviso = { texto: estado.mensagem, papel: 'alert', erro: true }
 
   return (

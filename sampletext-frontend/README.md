@@ -16,6 +16,16 @@ verificar as regras. Configuração e uso: [sessão e HTTP](docs/sessao-http.md)
 - `services/livros.js`: `listarLivros`, `buscarLivro` e `validarTema`. Com `VITE_USAR_MOCK` ligado (padrão) usam `livrosMock` e `services/temas.js`. As rotas reais estão marcadas com `TODO` (#9 do backend e validação do tema):
   `GET /livros/`, `GET /livros/:id/` e `POST /conteudos/validar-tema/` (resposta `{ status: 'ok' | 'amplo' | 'invalido', tema? }`).
 
+## Fluxo completo da busca, livros e conteúdos salvos
+
+- Busca: `POST /conteudos/validar-tema/` → se `amplo`, o campo é limpo e o usuário digita um subtópico, validado de novo → `ok` abre `/resumo?tema=...` (`POST /conteudos/gerar/`).
+- Salvar o resumo: `SalvarModal` escolhe um livro existente ou cria um novo (`POST /livros/` + `POST /conteudos/`). Com `?livro=<id>` salva direto.
+- Reabrir: chips do livro abrem `/resumo?conteudo=<id>` (`GET /conteudos/:id/`).
+- Gerenciar: botão "Gerenciar" na tela do livro permite renomear/excluir livro e conteúdos (`PATCH`/`DELETE`).
+- Menu lateral: lista os livros e tem "Novo livro" (modal); atualiza sozinho ao criar/renomear/excluir.
+- **API real:** defina `VITE_USAR_MOCK=false` e `VITE_API_URL` no `.env`. Sem isso o app usa dados de exemplo (`services/lojaMock.js`).
+- Testes: `node --test` (sem argumentos) roda `livros.test.js` e os demais.
+
 No modo mock, testar na busca: `Cálculo I` ou `Química` (tema amplo), `qwrtp` (inválido) e `Regra da cadeia` (válido).
 
 Testar as regras de classificação do tema sem navegador:

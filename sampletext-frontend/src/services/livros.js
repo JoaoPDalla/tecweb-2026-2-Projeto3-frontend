@@ -1,48 +1,88 @@
-import { ApiError, request } from './api'
-import { livrosMock } from './mocks'
-import { classificarTema } from './temas'
+import { lerSessao } from './auth.js'
+import { request } from './api.js'
+import * as loja from './lojaMock.js'
+import { usarMock } from './modo.js'
+import { classificarTema } from './temas.js'
 
-const USAR_MOCK = import.meta.env.VITE_USAR_MOCK !== 'false'
-const esperar = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+// Livros do usuário. Com VITE_USAR_MOCK ligado (padrão) usa exemplos em memória;
+// com `false` chama a API real (rotas em docs/tarefas-2-9-20.md do backend).
 
-// Lista os livros do usuário (menu lateral).
-// Formato esperado: [{ id, nome }, ...]
-// TODO: ligar ao endpoint de Conteúdo (issue #9) e confirmar a rota.
-let livrosEmCache = null
-export function listarLivros() {
-  if (!livrosEmCache) {
-    const pedido = USAR_MOCK ? esperar(300).then(() => livrosMock) : request('/livros/')
-    // Em caso de erro, não guarda: a próxima chamada tenta de novo.
-    livrosEmCache = pedido.catch((erro) => {
-      livrosEmCache = null
-      throw erro
-    })
-  }
-  return livrosEmCache
+// ---- aviso de mudanças -----------------------------------------------------
+// O menu lateral e as telas se atualizam quando um livro é criado, renomeado ou excluído.
+const ouvintes = new Set()
+let lista = null // { token, pedido }: a lista é guardada por sessão
+
+export function aoMudarLivros(ouvinte) {
+  ouvintes.add(ouvinte)
+  return () => ouvintes.delete(ouvinte)
 }
 
-// Busca um livro com os tópicos (chips) já salvos nele.
-// Formato esperado: { id, nome, topicos: [{ id, tema }] }. Lança ApiError(404) se não existir.
-// TODO: ligar ao endpoint de Conteúdo (issue #9).
-export async function buscarLivro(id) {
-  if (USAR_MOCK) {
-    await esperar(300)
-    const livro = livrosMock.find((l) => String(l.id) === String(id))
-    if (!livro) throw new ApiError('Livro não encontrado.', 404)
-    return livro
-  }
-  return request(`/livros/${encodeURIComponent(id)}/`)
+function livrosMudaram() {
+  lista = null
+  ouvintes.forEach((ouvinte) => ouvinte())
 }
+
+// ---- consulta --------------------------------------------------------------
+
+// Lista os livros: [{ id, nome, criado_em }]. Repete a consulta só quando algo muda
+// ou quando outra pessoa entra no site (a lista é guardada junto com o token).
+export function listarLivros(opcoes = {}) {
+  const token = lerSessao()?.token ?? null
+  if (lista && lista.token === token) return lista.pedido
+
+  const bruto = usarMock() ? loja.listarLivros() : request('/livros/', opcoes)
+  const pedido = bruto.then((dados) => (Array.isArray(dados) ? dados : (dados.results ?? [])))
+  const atual = { token, pedido }
+  lista = atual
+  // Em caso de erro (inclusive cancelamento) não guarda: a próxima chamada tenta de novo.
+  pedido.catch(() => {
+    if (lista === atual) lista = null
+  })
+  return pedido
+}
+
+// Abre um livro: { id, nome, criado_em, conteudos: [{ id, tema, criado_em }] }.
+// Lança ApiError com status 404 se ele não existir (ou for de outra pessoa).
+export function buscarLivro(id, opcoes = {}) {
+  if (usarMock()) return loja.buscarLivro(id)
+  return request(`/livros/${encodeURIComponent(id)}/`, opcoes)
+}
+
+// ---- alterações ------------------------------------------------------------
+
+export async function criarLivro(nome, opcoes = {}) {
+  const livro = usarMock()
+    ? await loja.criarLivro(nome)
+    : await request('/livros/', { ...opcoes, method: 'POST', corpo: { nome } })
+  livrosMudaram()
+  return livro
+}
+
+export async function renomearLivro(id, nome, opcoes = {}) {
+  const livro = usarMock()
+    ? await loja.renomearLivro(id, nome)
+    : await request(`/livros/${encodeURIComponent(id)}/`, { ...opcoes, method: 'PATCH', corpo: { nome } })
+  livrosMudaram()
+  return livro
+}
+
+// Exclui o livro e, junto, os conteúdos salvos nele.
+export async function excluirLivro(id, opcoes = {}) {
+  if (usarMock()) await loja.excluirLivro(id)
+  else await request(`/livros/${encodeURIComponent(id)}/`, { ...opcoes, method: 'DELETE' })
+  livrosMudaram()
+}
+
+// ---- busca -----------------------------------------------------------------
 
 // Confere se o tema digitado serve para gerar um resumo.
-// Formato esperado: { status: 'ok' | 'amplo' | 'invalido', tema? }
+// Resposta: { status: 'ok' | 'amplo' | 'invalido', tema, motivo? }
 //   amplo    -> tema grande demais ("Cálculo I"): o usuário deve destrinchar;
 //   invalido -> não parece uma matéria de estudo.
-// TODO: ligar à validação semântica do tema do backend (#14 do backend) e confirmar a rota.
-export async function validarTema(tema) {
-  if (USAR_MOCK) {
-    await esperar(600)
+export async function validarTema(tema, opcoes = {}) {
+  if (usarMock()) {
+    await loja.esperar(600)
     return classificarTema(tema)
   }
-  return request('/conteudos/validar-tema/', { method: 'POST', corpo: { tema } })
+  return request('/conteudos/validar-tema/', { ...opcoes, method: 'POST', corpo: { tema } })
 }
