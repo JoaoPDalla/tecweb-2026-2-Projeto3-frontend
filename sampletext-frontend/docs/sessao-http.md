@@ -53,8 +53,9 @@ armazenamento e callback de expiração injetáveis para testes.
 Copie `.env.example` para `.env` e ajuste `VITE_API_URL`. Nunca coloque uma chave
 de IA em uma variável `VITE_*`; essa chave pertence exclusivamente ao backend.
 
-`VITE_USAR_MOCK=true` conserva os exemplos de conteúdo/livros enquanto suas APIs
-e a integração #16 não estiverem prontas. Autenticação sempre usa o backend real.
+`VITE_USAR_MOCK=true` conserva o modo de desenvolvimento do CRUD de livros e
+conteúdos. A geração usada na #16 e a autenticação sempre usam o backend real.
+Veja [integração de estudo](integracao-estudo.md) para o fluxo de resumo/quiz.
 As telas e os serviços de livros, busca, resumo e resolução não foram reescritos.
 Login, barra e rotas receberam apenas a ligação necessária com a sessão.
 
