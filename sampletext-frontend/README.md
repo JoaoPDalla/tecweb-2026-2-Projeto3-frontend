@@ -1,5 +1,12 @@
 # React + Vite
 
+## Sessão e HTTP — #6 e #12
+
+As rotas de estudo agora validam a sessão com o backend. O contexto compartilha
+o usuário, restaura o login e acompanha a saída em outras abas. O cliente HTTP
+trata erros, timeout, cancelamento e expiração de token. Execute `npm test` para
+verificar as regras. Configuração e uso: [sessão e HTTP](docs/sessao-http.md).
+
 ## Busca, menu lateral e tela do livro (#3, #7 e #13)
 
 - `/inicio` (`pages/Inicio.jsx`): tela "O que vamos estudar hoje?". Valida o tema e, se servir, abre `/resumo?tema=...`. O login agora leva para ela. Estados: carregando ("Verificando o tema…"), tema amplo ("Cálculo I é um tema muito amplo, destrinche", com o campo limpo), matéria inválida (mantém o texto para corrigir), campo vazio e erro de conexão (com "Tentar de novo").
